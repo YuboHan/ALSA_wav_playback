@@ -36,6 +36,8 @@ void * print_wav_header(wav_header * hdr) {
 }
 
 int main(int argc, char ** argv) {
+    
+    // Variable declaration
 	int rc;
 	char * buffer;
   	int buffer_size;
@@ -52,12 +54,16 @@ int main(int argc, char ** argv) {
 
   	FILE * fp;
 
-  	if (argc < 2)
+    
+    // Argument parsing
+  	if (argc != 2)
 	{
-		printf("Enter filename of the wav file you want to play as an argument: %s filename.txt\n", argv[0]);
+        printf("Incorrect usage: Enter filename of the wav file you want to play as an argument: %s filename.txt\n", argv[0]);
 		return 1;
 	}
 
+    
+    // Open wav file to read
 	fp = fopen(argv[1], "rb");
 
 	if (fp == NULL)
@@ -69,13 +75,15 @@ int main(int argc, char ** argv) {
 	wav_header_info = malloc(44);
 
 	fread(wav_header_info, 1, 44, fp);
-	//fclose(fp);
+    
 
-	print_wav_header(wav_header_info);
+	// print_wav_header(wav_header_info);
 
+    
+    // Assign variables that were read from the wave file
 	channels = wav_header_info->number_of_channels;
 	rate = wav_header_info->sample_rate;
-	periods_per_buffer = 2; // Do whatever you want here
+	periods_per_buffer = 2; // Down to user preference, depending on size of internal ring buffer of ALSA
 
 
   	// Open PCM device for playback
@@ -84,12 +92,14 @@ int main(int argc, char ** argv) {
     	printf("ERROR: Cannot open pcm device. %s\n", snd_strerror(rc));
   	}
 
+    
   	// Allocate hardware parameters
   	if ((rc = snd_pcm_hw_params_malloc(&params)) < 0)
   	{
   		printf("ERROR: Cannot allocate hardware parameters. %s\n", snd_strerror(rc));
   	}
 
+    
   	// Initialize parameters with default values
   	if ((rc = snd_pcm_hw_params_any(handle, params)) < 0)
   	{
